@@ -5,7 +5,11 @@
 </head>
 <body>
 	<canvas id="myCanvas" width="1024" height="400"></canvas>
-	<img src="./body.gif" style="display:none" id="image">
+	<img src="./img/body.gif" style="display:none" id="body">
+	<img src="./img/head.gif" style="display:none" id="head">
+	<img src="./img/tail.gif" style="display:none" id="tail">
+	<img src="./img/food.gif" style="display:none" id="food">
+
 
 
 	<br>
@@ -36,7 +40,11 @@ var positionx;
 var positiony;
 var c=document.getElementById("myCanvas");
 var cxt=c.getContext("2d");
-var img=document.getElementById("image");
+var body=document.getElementById("body");
+var head=document.getElementById("head");
+var tail=document.getElementById("tail");
+var food=document.getElementById("food");
+
 
 
 function newtarg()
@@ -94,7 +102,7 @@ positionsy[movno]=positiony;
 movno++;
 
 cxt.fillStyle="#00F";
-cxt.drawImage(img,targx,targy,20,20);
+cxt.drawImage(food,targx,targy,20,20);
 
 for(var i=-nob;i<0;i++)
 {
@@ -107,7 +115,7 @@ if(positionx==positionsx[i+movno]&&positiony==positionsy[i+movno]&&i<-1)
 }
 
 cxt.fillStyle="#FF0000";
-cxt.drawImage(img,positionsx[i+movno],positionsy[i+movno],20,20);
+cxt.drawImage(body,positionsx[i+movno],positionsy[i+movno],20,20);
 pdir=dir;
 
 };
