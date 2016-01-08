@@ -6,27 +6,36 @@
 </head>
 <body id="mainbody">
 	<canvas id="background" width="1024" height="400"></canvas>
-	<img src="./body.gif" class="hidden" id="image">
+	<!--<img src="./res/img/body.gif" display="none" id="image">-->
 <br>
 <br>
 <br>
 <h1 id="score">Score : 0</h1>
 <script type="text/javascript">
+var back=document.getElementById("background");
+var width,height;
 $(document).ready(function(){
-var back=document.getElementById("background");
-background.width="200";
-background.height="200";
+width=window.innerWidth;
+height=window.innerHeight;
+/*back.width=width;
+back.height=height;*/
 var cxt=back.getContext("2d");
+cxt.canvas.width=width;
+cxt.canvas.height=height;
 cxt.fillStyle="#000";
-cxt.fillRect(0,0,1024,1000);
-$("canvas").slideDown(5000);
+cxt.fillRect(0,0,width,height);
 });
-$(document).resize(function(){
-var back=document.getElementById("background");
-background.width+=50;
-background.height+=50;
-console.log("dd");
+$(window).resize(function(){
+width=window.innerWidth;
+height=window.innerHeight;
+/*back.width=width;
+back.height=height;*/
 
+var cxt=back.getContext("2d");
+cxt.canvas.width=width;
+cxt.canvas.height=height;
+cxt.fillStyle="#000";
+cxt.fillRect(0,0,width,height);
 });
 </script>
 
