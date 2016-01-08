@@ -1,24 +1,3 @@
-<html>
-<head>
-	<title></title>
-	   <script  src="jquery.min.js"></script>
-</head>
-<body>
-	<canvas id="myCanvas" width="1024" height="400"></canvas>
-	<img src="./img/body.gif" style="display:none" id="body">
-	<img src="./img/head.gif" style="display:none" id="head">
-	<img src="./img/tail.gif" style="display:none" id="tail">
-	<img src="./img/food.gif" style="display:none" id="food">
-
-
-
-	<br>
-<br>
-<br>
-<h1 id="score">Score : 0</h1>
-<script type="text/javascript">
-
-
 var dir="r";
 var pdir="r";
 var targx;
@@ -40,11 +19,7 @@ var positionx;
 var positiony;
 var c=document.getElementById("myCanvas");
 var cxt=c.getContext("2d");
-var body=document.getElementById("body");
-var head=document.getElementById("head");
-var tail=document.getElementById("tail");
-var food=document.getElementById("food");
-
+var img=document.getElementById("image");
 
 
 function newtarg()
@@ -102,7 +77,7 @@ positionsy[movno]=positiony;
 movno++;
 
 cxt.fillStyle="#00F";
-cxt.drawImage(food,targx,targy,20,20);
+cxt.fillRect(targx,targy,20,20);
 
 for(var i=-nob;i<0;i++)
 {
@@ -115,7 +90,7 @@ if(positionx==positionsx[i+movno]&&positiony==positionsy[i+movno]&&i<-1)
 }
 
 cxt.fillStyle="#FF0000";
-cxt.drawImage(body,positionsx[i+movno],positionsy[i+movno],20,20);
+cxt.fillRect(positionsx[i+movno],positionsy[i+movno],20,20);
 pdir=dir;
 
 };
@@ -201,8 +176,3 @@ $(document).keypress(function(event){
 
 
 });
-
-</script>
-
-</body>
-</html>

@@ -1,0 +1,34 @@
+<html>
+<head>
+	<title></title>
+	   <script  src="./res/js/jquery.min.js"></script>
+	  <!-- <script  src="./res/snake.js"></script>-->
+</head>
+<body id="mainbody">
+	<canvas id="background" width="1024" height="400"></canvas>
+	<img src="./body.gif" class="hidden" id="image">
+<br>
+<br>
+<br>
+<h1 id="score">Score : 0</h1>
+<script type="text/javascript">
+$(document).ready(function(){
+var back=document.getElementById("background");
+background.width="200";
+background.height="200";
+var cxt=back.getContext("2d");
+cxt.fillStyle="#000";
+cxt.fillRect(0,0,1024,1000);
+$("canvas").slideDown(5000);
+});
+$(document).resize(function(){
+var back=document.getElementById("background");
+background.width+=50;
+background.height+=50;
+console.log("dd");
+
+});
+</script>
+
+</body>
+</html>
