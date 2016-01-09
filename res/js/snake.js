@@ -1,7 +1,7 @@
-var updateInterval,score;
+var refreshInterval,score;
 var canvas,ctx;
 
-var blockSize,canvasWidth,canvasHeight,xMax,yMax,queueSize;
+var cellSize,canvasWidth,canvasHeight,xMax,yMax,queueSize;
 
 var xCords;
 var yCords
@@ -24,27 +24,37 @@ $(document).ready(function(){
 	canvasHeight=ctx.canvas.height;
 	var bgimg=document.getElementById("bgimage");
 	ctx.drawImage(bgimg,0,0);
-	initSnake();
+	initSnake();  // REFRESH INTERVAL, CELL SIZE, INITIAL DIRECTION, INITIAL SCORE
 	initRes();
 	updateSnake();
 });
 
-function initSnake()
+function initSnake(updateInterval,blockSize,initialDirection,initialScore)
 {
+	/*********DEFAULT VALUES***********/
+
+	if(updateInterval===undefined)
+		updateInterval=100;
+	if(blockSize===undefined)
+		blockSize=20;
+	if(initialDirection===undefined)
+		initialDirection='R';
+	if(initialScore===undefined)
+		initialScore=0;
 
 	/**********INITIAL VALUES***********/
-	updateInterval=100;
-	blockSize=20;
-	currentX=1;
-	currentY=12;
-	dir='R';
+	refreshInterval=updateInterval;
+	cellSize=blockSize;
+	dir=initialDirection;
+	score=initialScore;
 	/**********************************/
 	
-	prevDir='R';
-	score=0;
-	xMax=canvasWidth/blockSize;
-	yMax=canvasHeight/blockSize;
+	prevDir=dir;
+	xMax=canvasWidth/cellSize;
+	yMax=canvasHeight/cellSize;
 	queueSize=xMax*yMax;
+	currentX=1;
+	currentY=parseInt(yMax/2);
 
 	xCords=new Array();
 	yCords=new Array();;
@@ -62,7 +72,7 @@ function initSnake()
 
 function logData()
 {
-	console.log("X : "+currentX+";Y : "+currentY+";Direction : "+dir+";Front : "+front+";Rear : "+rear);
+	console.log("X : "+currentX+";Y : "+currentY+";Direction : "+dir+";Front : "+front+";Rear : "+rear+";FoodX : "+foodX+";FoodY : "+foodY);
 }
 
 function initRes()
@@ -80,10 +90,11 @@ function initRes()
 
 function updateSnake()
 {
-	draw();
-	move();
 
-	setTimeout(updateSnake,updateInterval);
+	if(move())
+		draw();
+
+	setTimeout(updateSnake,refreshInterval);
 }
 
 function drawBackground()
@@ -98,13 +109,13 @@ function drawHead(xPos,yPos,headDir)
 
 	switch(headDir)
 	{
-		case 'L':ctx.drawImage(headl,xPos,yPos,blockSize,blockSize);
+		case 'L':ctx.drawImage(headl,xPos,yPos,cellSize,cellSize);
 				 break;
-		case 'R':ctx.drawImage(headr,xPos,yPos,blockSize,blockSize);
+		case 'R':ctx.drawImage(headr,xPos,yPos,cellSize,cellSize);
 				 break;
-		case 'U':ctx.drawImage(headu,xPos,yPos,blockSize,blockSize);
+		case 'U':ctx.drawImage(headu,xPos,yPos,cellSize,cellSize);
 				 break;
-		case 'D':ctx.drawImage(headd,xPos,yPos,blockSize,blockSize);
+		case 'D':ctx.drawImage(headd,xPos,yPos,cellSize,cellSize);
 				 break;
 	}
 
@@ -116,10 +127,10 @@ function drawBody(xPos,yPos,bodyDir)
 	switch(bodyDir)
 	{
 		case 'L':
-		case 'R':ctx.drawImage(bodyh,xPos,yPos,blockSize,blockSize);
+		case 'R':ctx.drawImage(bodyh,xPos,yPos,cellSize,cellSize);
 				 break;
 		case 'U':
-		case 'D':ctx.drawImage(bodyv,xPos,yPos,blockSize,blockSize);
+		case 'D':ctx.drawImage(bodyv,xPos,yPos,cellSize,cellSize);
 				 break;
 	}
 
@@ -129,13 +140,13 @@ function drawTail(xPos,yPos,tailDir)
 {
 	switch(tailDir)
 	{
-		case 'L':ctx.drawImage(taill,xPos,yPos,blockSize,blockSize);
+		case 'L':ctx.drawImage(taill,xPos,yPos,cellSize,cellSize);
 				 break;
-		case 'R':ctx.drawImage(tailr,xPos,yPos,blockSize,blockSize);
+		case 'R':ctx.drawImage(tailr,xPos,yPos,cellSize,cellSize);
 				 break;
-		case 'U':ctx.drawImage(tailu,xPos,yPos,blockSize,blockSize);
+		case 'U':ctx.drawImage(tailu,xPos,yPos,cellSize,cellSize);
 				 break;
-		case 'D':ctx.drawImage(taild,xPos,yPos,blockSize,blockSize);
+		case 'D':ctx.drawImage(taild,xPos,yPos,cellSize,cellSize);
 				 break;
 	}
 
@@ -146,8 +157,8 @@ function drawSnake()
 	var i;
 	var xPos,yPos,last;
 
-	xPos=xCords[rear]*blockSize;
-	yPos=yCords[rear]*blockSize;
+	xPos=xCords[rear]*cellSize;
+	yPos=yCords[rear]*cellSize;
 
 	drawTail(xPos,yPos,directions[rear]);
 
@@ -156,13 +167,13 @@ function drawSnake()
 		last+=queueSize;
 	for(i=rear+1;i!=last;i=(i+1)%queueSize)
 	{
-		xPos=xCords[i]*blockSize;
-		yPos=yCords[i]*blockSize;
+		xPos=xCords[i]*cellSize;
+		yPos=yCords[i]*cellSize;
 		drawBody(xPos,yPos,directions[i]);
 	}
 
-	xPos=xCords[last]*blockSize;
-	yPos=yCords[last]*blockSize;
+	xPos=xCords[last]*cellSize;
+	yPos=yCords[last]*cellSize;
 
 	drawHead(xPos,yPos,directions[last]);
 
@@ -171,9 +182,9 @@ function drawSnake()
 function drawFood()
 {
 	var xPos,yPos;
-	xPos=foodX*blockSize;
-	yPos=foodY*blockSize;
-	ctx.drawImage(food,xPos,yPos,blockSize,blockSize);
+	xPos=foodX*cellSize;
+	yPos=foodY*cellSize;
+	ctx.drawImage(food,xPos,yPos,cellSize,cellSize);
 }
 
 function draw()
@@ -196,11 +207,16 @@ function validPoint(xPos,yPos)
 
 function addFood()
 {
-	var rand;
-	rand=Math.random()*(xMax-1);
-	foodX=parseInt(rand+1);
-	rand=Math.random()*(yMax-1);
-	foodY=parseInt(rand+1);
+	var rand,success;
+	success=false;
+	while(!success)
+	{
+		rand=Math.random()*(xMax-1);
+		foodX=parseInt(rand+1);
+		rand=Math.random()*(yMax-1);
+		foodY=parseInt(rand+1);
+		success=validPoint(foodX,foodY);
+	}
 }
 
 function isFood()
@@ -216,7 +232,7 @@ function updateScore()
 	$("#score").fadeOut();
 	$("#score").fadeIn();
 	setTimeout(function(){
-		$("#score").html("Score : "+score);
+		$("#score").html(""+score);
 	},100);
 }
 
@@ -259,6 +275,9 @@ function move()
 				break;	
 	}
 
+	newPosX=parseInt(newPosX);
+	newPosY=parseInt(newPosY);
+
 	if(validPoint(newPosX,newPosY))
 	{
 		currentX=newPosX;
@@ -278,6 +297,7 @@ function move()
 	{
 		initSnake();
 	}
+	return true;
 
 };
 
@@ -314,10 +334,3 @@ $(document).keypress(function(event){
 	}
 
 });
-
-
-
-
-
-
-
