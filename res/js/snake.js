@@ -12,7 +12,7 @@ var front,rear;
 var foodX,foodY,currentX,currentY;
 var dir,prevDir;
 
-var headl,headr,headu,headd,taill,tailr,tailu,taild,food;
+var headl,headr,headu,headd,taill,tailr,tailu,taild,food,ld,lu,rd,ru;
 
 
 
@@ -24,8 +24,8 @@ $(document).ready(function(){
 	canvasHeight=ctx.canvas.height;
 	var bgimg=document.getElementById("bgimage");
 	ctx.drawImage(bgimg,0,0);
-	initBoard();
-	initSnake(100,0,1,1,10);  // REFRESH INTERVAL, SCORE, LEVEL, LEVEL TARGETS, BASE SCORE
+	initBoard();	 // BLOCK SIZE, REFRESH RATE
+	initSnake();  // REFRESH INTERVAL, SCORE, LEVEL, LEVEL TARGETS, BASE SCORE
 	initRes();
 	updateSnake();
 });
@@ -117,6 +117,11 @@ function initRes()
 	tailu=document.getElementById("tailu");
 	taild=document.getElementById("taild");
 	food=document.getElementById("food");
+	ld=document.getElementById("ld");
+	lu=document.getElementById("lu");
+	rd=document.getElementById("rd");
+	ru=document.getElementById("ru");
+
 }
 
 function updateSnake()
@@ -167,6 +172,46 @@ function drawBody(xPos,yPos,bodyDir)
 
 }
 
+function drawBend(xPos,yPos,orgDir,newDir)
+{
+	switch(orgDir)
+	{
+		case 'L':switch(newDir)
+				{
+					case 'U':ctx.drawImage(lu,xPos,yPos,cellSize,cellSize);
+							break;
+					case 'D':ctx.drawImage(ld,xPos,yPos,cellSize,cellSize);
+							break;
+				}
+				break;
+		case 'R':switch(newDir)
+				{
+					case 'U':ctx.drawImage(ru,xPos,yPos,cellSize,cellSize);
+							break;
+					case 'D':ctx.drawImage(rd,xPos,yPos,cellSize,cellSize);
+							break;
+				}
+				break;
+		case 'U':switch(newDir)
+				{
+					case 'L':ctx.drawImage(rd,xPos,yPos,cellSize,cellSize);
+							break;
+					case 'R':ctx.drawImage(ld,xPos,yPos,cellSize,cellSize);
+							break;
+				}
+				break;
+		case 'D':switch(newDir)
+				{
+					case 'L':ctx.drawImage(ru,xPos,yPos,cellSize,cellSize);
+							break;
+					case 'R':ctx.drawImage(lu,xPos,yPos,cellSize,cellSize);
+							break;
+				}
+				break;
+
+	}
+}
+
 function drawTail(xPos,yPos,tailDir)
 {
 	switch(tailDir)
@@ -185,27 +230,30 @@ function drawTail(xPos,yPos,tailDir)
 
 function drawSnake()
 {
-	var i;
+	var i,next;
 	var xPos,yPos,last;
 
 	var debug=0;
 
 	xPos=xCords[rear]*cellSize;
 	yPos=yCords[rear]*cellSize;
+	next=(rear+1)%queueSize;
 
-	drawTail(xPos,yPos,directions[rear]);
+
+	drawTail(xPos,yPos,directions[next]);
 
 	last=front-1;
 	if(last==-1)
 		last=queueSize-1;
-	for(i=(rear+1)%queueSize;i!=last;i=(i+1)%queueSize)
+	for(i=next;i!=last;i=(i+1)%queueSize)
 	{
 		xPos=xCords[i]*cellSize;
 		yPos=yCords[i]*cellSize;
-		drawBody(xPos,yPos,directions[i]);
-		debug++;
-		if(debug>4)
-			console.log(front+" "+rear+" "+last);
+		next=(i+1)%queueSize;
+		if(directions[i]==directions[next])
+			drawBody(xPos,yPos,directions[i]);
+		else 
+			drawBend(xPos,yPos,directions[i],directions[next]);		
 	}
 
 	xPos=xCords[last]*cellSize;
