@@ -1,6 +1,8 @@
 var updateInterval,score;
 var canvas,ctx;
 
+var blockSize,canvasWidth,canvasHeight,xMax,yMax,queueSize;
+
 var xCords;
 var yCords
 var directions;
@@ -18,6 +20,8 @@ $(document).ready(function(){
 
 	canvas=document.getElementById("background");
 	ctx=canvas.getContext("2d");
+	canvasWidth=ctx.canvas.width;
+	canvasHeight=ctx.canvas.height;
 	var bgimg=document.getElementById("bgimage");
 	ctx.drawImage(bgimg,0,0);
 	initSnake();
@@ -27,11 +31,21 @@ $(document).ready(function(){
 
 function initSnake()
 {
+
+	/**********INITIAL VALUES***********/
+	updateInterval=100;
+	blockSize=20;
 	currentX=1;
 	currentY=12;
-	updateInterval=250;
 	dir='R';
+	/**********************************/
+	
+	prevDir='R';
 	score=0;
+	xMax=canvasWidth/blockSize;
+	yMax=canvasHeight/blockSize;
+	queueSize=xMax*yMax;
+
 	xCords=new Array();
 	yCords=new Array();;
 	directions=new Array();
@@ -84,29 +98,44 @@ function drawHead(xPos,yPos,headDir)
 
 	switch(headDir)
 	{
-		case 'L':ctx.drawImage(headl,xPos,yPos,20,20);
+		case 'L':ctx.drawImage(headl,xPos,yPos,blockSize,blockSize);
 				 break;
-		case 'R':ctx.drawImage(headr,xPos,yPos,20,20);
+		case 'R':ctx.drawImage(headr,xPos,yPos,blockSize,blockSize);
 				 break;
-		case 'U':ctx.drawImage(headu,xPos,yPos,20,20);
+		case 'U':ctx.drawImage(headu,xPos,yPos,blockSize,blockSize);
 				 break;
-		case 'D':ctx.drawImage(headd,xPos,yPos,20,20);
+		case 'D':ctx.drawImage(headd,xPos,yPos,blockSize,blockSize);
 				 break;
 	}
 
 }
 
-function drawTail(xPos,yPos,headDir)
+function drawBody(xPos,yPos,bodyDir)
 {
-	switch(headDir)
+
+	switch(bodyDir)
 	{
-		case 'L':ctx.drawImage(taill,xPos,yPos,20,20);
+		case 'L':
+		case 'R':ctx.drawImage(bodyh,xPos,yPos,blockSize,blockSize);
 				 break;
-		case 'R':ctx.drawImage(tailr,xPos,yPos,20,20);
+		case 'U':
+		case 'D':ctx.drawImage(bodyv,xPos,yPos,blockSize,blockSize);
 				 break;
-		case 'U':ctx.drawImage(tailu,xPos,yPos,20,20);
+	}
+
+}
+
+function drawTail(xPos,yPos,tailDir)
+{
+	switch(tailDir)
+	{
+		case 'L':ctx.drawImage(taill,xPos,yPos,blockSize,blockSize);
 				 break;
-		case 'D':ctx.drawImage(taild,xPos,yPos,20,20);
+		case 'R':ctx.drawImage(tailr,xPos,yPos,blockSize,blockSize);
+				 break;
+		case 'U':ctx.drawImage(tailu,xPos,yPos,blockSize,blockSize);
+				 break;
+		case 'D':ctx.drawImage(taild,xPos,yPos,blockSize,blockSize);
 				 break;
 	}
 
@@ -117,21 +146,23 @@ function drawSnake()
 	var i;
 	var xPos,yPos,last;
 
-	xPos=xCords[rear]*20;
-	yPos=yCords[rear]*20;
+	xPos=xCords[rear]*blockSize;
+	yPos=yCords[rear]*blockSize;
 
 	drawTail(xPos,yPos,directions[rear]);
 
-	last=(front-1)%800;
+	last=(front-1)%queueSize;
 	if(last<0)
-		last+=80;
-	for(i=rear+1;i!=last;i=(i+1)%800)
+		last+=queueSize;
+	for(i=rear+1;i!=last;i=(i+1)%queueSize)
 	{
-
+		xPos=xCords[i]*blockSize;
+		yPos=yCords[i]*blockSize;
+		drawBody(xPos,yPos,directions[i]);
 	}
 
-	xPos=xCords[last]*20;
-	yPos=yCords[last]*20;
+	xPos=xCords[last]*blockSize;
+	yPos=yCords[last]*blockSize;
 
 	drawHead(xPos,yPos,directions[last]);
 
@@ -140,9 +171,9 @@ function drawSnake()
 function drawFood()
 {
 	var xPos,yPos;
-	xPos=foodX*20;
-	yPos=foodY*20;
-	ctx.drawImage(food,xPos,yPos,20,20);
+	xPos=foodX*blockSize;
+	yPos=foodY*blockSize;
+	ctx.drawImage(food,xPos,yPos,blockSize,blockSize);
 }
 
 function draw()
@@ -155,7 +186,7 @@ function draw()
 function validPoint(xPos,yPos)
 {
 	var i;
-	for(i=rear;i!=front;i=(i+1)%800)
+	for(i=rear;i!=front;i=(i+1)%queueSize)
 	{
 		if((xCords[i]==xPos)&&(yCords[i]==yPos))
 			return false;
@@ -166,9 +197,9 @@ function validPoint(xPos,yPos)
 function addFood()
 {
 	var rand;
-	rand=Math.random()*39;
+	rand=Math.random()*(xMax-1);
 	foodX=parseInt(rand+1);
-	rand=Math.random()*24;
+	rand=Math.random()*(yMax-1);
 	foodY=parseInt(rand+1);
 }
 
@@ -199,12 +230,12 @@ function addCurrent()
 	xCords[front]=currentX;
 	yCords[front]=currentY;
 	directions[front]=dir;
-	front=(front+1)%800;
+	front=(front+1)%queueSize;
 }
 
 function removeLast()
 {
-	rear=(rear+1)%800;
+	rear=(rear+1)%queueSize;
 }
 
 function move()
@@ -216,31 +247,32 @@ function move()
 	{
 		case 'L':newPosX--;
 				if(newPosX<0)
-					newPosX==39;
+					newPosX=xMax-1;
 				break;
-		case 'R':newPosX=(newPosX+1)%40;
+		case 'R':newPosX=(newPosX+1)%xMax;
 				break;
 		case 'U':newPosY--;
 				if(newPosY<0)
-					newPosY==24;
+					newPosY=yMax-1;
 				break;
-		case 'D':newPosY=(newPosY+1)%25;
+		case 'D':newPosY=(newPosY+1)%yMax;
 				break;	
 	}
 
 	if(validPoint(newPosX,newPosY))
 	{
-
 		currentX=newPosX;
 		currentY=newPosY;
-
+		logData();
+		prevDir=dir;
+		addCurrent();
 		if(isFood())
 		{
 			addFood();
 			updateScore();
 		}
-		addCurrent();
-		removeLast();
+		else
+			removeLast();
 	}
 	else
 	{
@@ -249,189 +281,43 @@ function move()
 
 };
 
-
-
-
-
-
-
-
-/*var dir="r";
-var pdir="r";
-var targx;
-var targy;
-var positionsx=new Array();
-var positionsy=new Array();
-var movno=0;
-var rand=Math.random();
-rand=parseInt((rand*100)%51)*20;
-targx=rand;
-
-rand=Math.random();
-rand=parseInt((rand*100)%20)*20;
-targy=rand;
-
-var score=0;
-var nob=1;
-var positionx;
-var positiony;
-var c=document.getElementById("myCanvas");
-var cxt=c.getContext("2d");
-var img=document.getElementById("image");
-
-
-function newtarg()
-{
-
-rand=Math.random();
-rand=parseInt((rand*100)%51)*20;
-targx=rand;
-
-rand=Math.random();
-rand=parseInt((rand*100)%20)*20;
-targy=rand;
-for(var i=-nob;i<0;i++)
-{
-
-if(targx==positionsx[i+movno]&&targy==positionsy[i+movno])
-{
-	rand=Math.random();
-rand=parseInt((rand*100)%51)*20;
-targx=rand;
-
-rand=Math.random();
-rand=parseInt((rand*100)%20)*20;
-targy=rand;
-i=-nob;
-
-}
-
-
-
-};
-
-
-
-
-
-score+=10;
-nob++;
-$("#score").fadeOut();
-$("#score").fadeIn();
-setTimeout(function(){
-$("#score").html("Score : "+score);
-},100);
-}
-
-
-
-function move()
-{
-cxt.fillStyle="#000";
-cxt.fillRect(0,0,1024,1000);
-
-positionsx[movno]=positionx;
-positionsy[movno]=positiony;
-movno++;
-
-cxt.fillStyle="#00F";
-cxt.fillRect(targx,targy,20,20);
-
-for(var i=-nob;i<0;i++)
-{
-
-if(positionx==positionsx[i+movno]&&positiony==positionsy[i+movno]&&i<-1)
-{
-	nob=1;
-	score=0;
-	$("#score").html("Score : 0").slideDown(100);
-}
-
-cxt.fillStyle="#FF0000";
-cxt.fillRect(positionsx[i+movno],positionsy[i+movno],20,20);
-pdir=dir;
-
-};
-
-
-
-
-if(positionx==targx&&positiony==targy)
-{
-	newtarg();
-}
-
-if(dir=='r')
-	positionx+=20;
-else if(dir=='l')
-	positionx-=20;
-else if(dir=='d')
-	positiony+=20;
-else if(dir=='u')
-	positiony-=20;
-
-if(positionx>1000)
-{
-	positionx=0;
-}
-else if(positiony>380)
-{
-	positiony=0;
-}
-else if(positionx<0)
-{
-	positionx=1000;
-}
-else if(positiony<0)
-{
-	positiony=380;
-}
-
-setTimeout(move, 100);
-}
-
-$(document).ready(function(){
-cxt.fillStyle="#000";
-cxt.fillRect(0,0,1024,1000);
-$("canvas").slideDown(5000);
-positionx=0;
-positiony=0;
-
-
-
-
-setTimeout(move, 1000);
-
-
 $(document).keypress(function(event){
+
 	event.preventDefault();
-	if(event.which==119)
+	if((event.which==119)||(event.which==87))
 	{
-		if(pdir!='d')
-		dir='u';
+		if(prevDir!='D')
+		{
+			dir='U';
+		}
 	}
-    else if(event.which==97)
+    else if((event.which==97)||(event.which==65))
     {
-    	if(pdir!='r')
-		dir='l';
+    	if(prevDir!='R')
+		{
+			dir='L';
+		}
 	}
-	else if(event.which==115)
+	else if((event.which==115)||(event.which==83))
 	{
-		if(pdir!='u')
-		dir='d';
+		if(prevDir!='U')
+		{
+			dir='D';
+		}
 	}
-	else if(event.which==100)
+	else if((event.which==100)||(event.which==68))
 	{
-		if(pdir!='l')
-		dir='r';
+		if(prevDir!='L')
+		{
+			dir='R';
+		}
 	}
-
-
-
 
 });
 
 
 
-});*/
+
+
+
 
