@@ -1,4 +1,4 @@
-var refreshInterval,score;
+var refreshInterval,refreshRate,score,level,levelUpdateScore,levelTargets,baseScore;
 var canvas,ctx;
 
 var cellSize,canvasWidth,canvasHeight,xMax,yMax,queueSize;
@@ -24,35 +24,66 @@ $(document).ready(function(){
 	canvasHeight=ctx.canvas.height;
 	var bgimg=document.getElementById("bgimage");
 	ctx.drawImage(bgimg,0,0);
-	initSnake();  // REFRESH INTERVAL, CELL SIZE, INITIAL DIRECTION, INITIAL SCORE
+	initBoard();
+	initSnake(100,0,1,1,10);  // REFRESH INTERVAL, SCORE, LEVEL, LEVEL TARGETS, BASE SCORE
 	initRes();
 	updateSnake();
 });
 
-function initSnake(updateInterval,blockSize,initialDirection,initialScore)
+function initBoard(blockSize,updateRate)
+{
+	/*********DEFAULT VALUES***********/
+	if(blockSize===undefined)
+		blockSize=20;
+	if(updateRate===undefined)
+		updateRate=2;
+
+	/**********INITIAL VALUES***********/
+	cellSize=blockSize;
+	refreshRate=updateRate;
+
+	/***********************************/
+
+	xMax=canvasWidth/cellSize;
+	yMax=canvasHeight/cellSize;
+	queueSize=xMax*yMax;
+}
+
+
+
+
+function initSnake(updateInterval,currentScore,currentLevel,levelFoods,foodScore)
 {
 	/*********DEFAULT VALUES***********/
 
 	if(updateInterval===undefined)
 		updateInterval=100;
-	if(blockSize===undefined)
-		blockSize=20;
-	if(initialDirection===undefined)
-		initialDirection='R';
-	if(initialScore===undefined)
-		initialScore=0;
+	if(currentScore===undefined)
+		currentScore=0;
+	if(currentLevel===undefined)
+		currentLevel=1;
+	if(levelFoods===undefined)
+		levelFoods=10;
+	if(foodScore===undefined)
+		foodScore=10;
+
 
 	/**********INITIAL VALUES***********/
 	refreshInterval=updateInterval;
-	cellSize=blockSize;
-	dir=initialDirection;
-	score=initialScore;
+	dir='R';
+	prevDir=dir;
+	score=currentScore;
+	level=currentLevel;
+	levelUpdateScore=currentScore+(levelFoods*foodScore*currentLevel);
+	levelTargets=levelFoods;
+	baseScore=foodScore;
+
+	$("#score").html(""+score);
+	$("#level").html(""+level);
+
 	/**********************************/
 	
-	prevDir=dir;
-	xMax=canvasWidth/cellSize;
-	yMax=canvasHeight/cellSize;
-	queueSize=xMax*yMax;
+
 	currentX=1;
 	currentY=parseInt(yMax/2);
 
@@ -157,19 +188,24 @@ function drawSnake()
 	var i;
 	var xPos,yPos,last;
 
+	var debug=0;
+
 	xPos=xCords[rear]*cellSize;
 	yPos=yCords[rear]*cellSize;
 
 	drawTail(xPos,yPos,directions[rear]);
 
-	last=(front-1)%queueSize;
-	if(last<0)
-		last+=queueSize;
-	for(i=rear+1;i!=last;i=(i+1)%queueSize)
+	last=front-1;
+	if(last==-1)
+		last=queueSize-1;
+	for(i=(rear+1)%queueSize;i!=last;i=(i+1)%queueSize)
 	{
 		xPos=xCords[i]*cellSize;
 		yPos=yCords[i]*cellSize;
 		drawBody(xPos,yPos,directions[i]);
+		debug++;
+		if(debug>4)
+			console.log(front+" "+rear+" "+last);
 	}
 
 	xPos=xCords[last]*cellSize;
@@ -226,9 +262,24 @@ function isFood()
 	return false;
 }
 
+function updateLevel()
+{
+	level++;
+	$("#level").fadeOut();
+	$("#level").fadeIn();
+	setTimeout(function(){
+		$("#level").html(""+level);
+	},100);
+
+	initSnake(refreshInterval/refreshRate,score,level,levelTargets,baseScore);
+
+}
+
 function updateScore()
 {
-	score+=10;
+	score+=(baseScore*level);
+	if(score==levelUpdateScore)
+		updateLevel();
 	$("#score").fadeOut();
 	$("#score").fadeIn();
 	setTimeout(function(){
@@ -282,7 +333,6 @@ function move()
 	{
 		currentX=newPosX;
 		currentY=newPosY;
-		logData();
 		prevDir=dir;
 		addCurrent();
 		if(isFood())
