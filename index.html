@@ -1,43 +1,40 @@
 <html>
 <head>
 	<title></title>
-	   <script  src="./res/js/jquery.min.js"></script>
-	  <!-- <script  src="./res/snake.js"></script>-->
-</head>
-<body id="mainbody">
-	<canvas id="background" width="1024" height="400"></canvas>
-	<!--<img src="./res/img/body.gif" display="none" id="image">-->
-<br>
-<br>
-<br>
-<h1 id="score">Score : 0</h1>
-<script type="text/javascript">
-var back=document.getElementById("background");
-var width,height;
-$(document).ready(function(){
-width=window.innerWidth;
-height=window.innerHeight;
-/*back.width=width;
-back.height=height;*/
-var cxt=back.getContext("2d");
-cxt.canvas.width=width;
-cxt.canvas.height=height;
-cxt.fillStyle="#000";
-cxt.fillRect(0,0,width,height);
-});
-$(window).resize(function(){
-width=window.innerWidth;
-height=window.innerHeight;
-/*back.width=width;
-back.height=height;*/
+		<script  src="./res/js/jquery.min.js"></script>
+		<script  src="./res/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="./res/css/bootstrap.min.css">
 
-var cxt=back.getContext("2d");
-cxt.canvas.width=width;
-cxt.canvas.height=height;
-cxt.fillStyle="#000";
-cxt.fillRect(0,0,width,height);
-});
-</script>
+		<script  src="./res/js/snake.js"></script>	
+		<link rel="stylesheet" type="text/css" href="./res/css/snake.css">
+
+</head>
+<body >
+	<br>
+	<img src="./res/img/back.gif" class="hidden" id="bgimage">
+	<img src="./res/img/bodyH.gif" class="hidden" id="bodyh">
+	<img src="./res/img/bodyV.gif" class="hidden" id="bodyv">
+	<img src="./res/img/headL.gif" class="hidden" id="headl">
+	<img src="./res/img/headR.gif" class="hidden" id="headr">
+	<img src="./res/img/headU.gif" class="hidden" id="headu">
+	<img src="./res/img/headD.gif" class="hidden" id="headd">
+	<img src="./res/img/tailL.gif" class="hidden" id="taill">
+	<img src="./res/img/tailR.gif" class="hidden" id="tailr">
+	<img src="./res/img/tailU.gif" class="hidden" id="tailu">
+	<img src="./res/img/tailD.gif" class="hidden" id="taild">
+	<img src="./res/img/food.gif" class="hidden" id="food">
+
+
+	<div class="container">
+		<div class="text-center"> 
+			<canvas id="background" width="800" height="500"></canvas>
+		</div>
+		<div class="text-center" id="scoreline">
+			<h1 id="score">Score : 0</h1>
+		</div>
+	</div>
+
+
 
 </body>
 </html>
