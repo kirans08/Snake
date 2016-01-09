@@ -399,31 +399,31 @@ function move()
 
 };
 
-$(document).keypress(function(event){
+$(document).keydown(function(event){
 
 	event.preventDefault();
-	if((event.which==119)||(event.which==87))
+	if((event.which==119)||(event.which==87)||(event.which==38))
 	{
 		if(prevDir!='D')
 		{
 			dir='U';
 		}
 	}
-    else if((event.which==97)||(event.which==65))
+    else if((event.which==97)||(event.which==65)||(event.which==37))
     {
     	if(prevDir!='R')
 		{
 			dir='L';
 		}
 	}
-	else if((event.which==115)||(event.which==83))
+	else if((event.which==115)||(event.which==83)||(event.which==40))
 	{
 		if(prevDir!='U')
 		{
 			dir='D';
 		}
 	}
-	else if((event.which==100)||(event.which==68))
+	else if((event.which==100)||(event.which==68)||(event.which==39))
 	{
 		if(prevDir!='L')
 		{
