@@ -12,7 +12,7 @@ var front,rear;
 var foodX,foodY,currentX,currentY;
 var dir,prevDir;
 
-var headl,headr,headu,headd,taill,tailr,tailu,taild,food,ld,lu,rd,ru;
+var headl,headr,headu,headd,taill,tailr,tailu,taild,food,ld,lu,rd,ru,body;
 
 
 
@@ -116,6 +116,7 @@ function initRes()
 	tailr=document.getElementById("tailr");
 	tailu=document.getElementById("tailu");
 	taild=document.getElementById("taild");
+	body=document.getElementById("body");
 	food=document.getElementById("food");
 	ld=document.getElementById("ld");
 	lu=document.getElementById("lu");
@@ -159,17 +160,7 @@ function drawHead(xPos,yPos,headDir)
 
 function drawBody(xPos,yPos,bodyDir)
 {
-
-	switch(bodyDir)
-	{
-		case 'L':
-		case 'R':ctx.drawImage(bodyh,xPos,yPos,cellSize,cellSize);
-				 break;
-		case 'U':
-		case 'D':ctx.drawImage(bodyv,xPos,yPos,cellSize,cellSize);
-				 break;
-	}
-
+	ctx.drawImage(body,xPos,yPos,cellSize,cellSize);
 }
 
 function drawBend(xPos,yPos,orgDir,newDir)
