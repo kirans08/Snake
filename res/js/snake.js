@@ -8,7 +8,6 @@ var yCords
 var directions;
 var front,rear;
 
-
 var foodX,foodY,currentX,currentY;
 var dir,prevDir;
 
@@ -25,7 +24,7 @@ $(document).ready(function(){
 	var bgimg=document.getElementById("bgimage");
 	ctx.drawImage(bgimg,0,0);
 	initBoard();	 // BLOCK SIZE, REFRESH RATE
-	initSnake(100,0,1,1000);  // REFRESH INTERVAL, SCORE, LEVEL, LEVEL TARGETS, BASE SCORE
+	initSnake();  // REFRESH INTERVAL, SCORE, LEVEL, LEVEL TARGETS, BASE SCORE
 	initRes();
 	updateSnake();
 });
@@ -63,7 +62,7 @@ function initSnake(updateInterval,currentScore,currentLevel,levelFoods,foodScore
 	if(currentLevel===undefined)
 		currentLevel=1;
 	if(levelFoods===undefined)
-		levelFoods=10;
+		levelFoods=100;
 	if(foodScore===undefined)
 		foodScore=10;
 
@@ -484,6 +483,49 @@ function goDown()
 	else
 		dir='L';
 }
+
+function isSafe(nextMoveDir)
+{
+	var newPosX,newPosY;
+	newPosX=currentX;
+	newPosY=currentY;
+	switch(nextMoveDir)
+	{
+		case 'L':newPosX--;
+				if(newPosX<0)
+					newPosX=xMax-1;
+				break;
+		case 'R':newPosX=(newPosX+1)%xMax;
+				break;
+		case 'U':newPosY--;
+				if(newPosY<0)
+					newPosY=yMax-1;
+				break;
+		case 'D':newPosY=(newPosY+1)%yMax;
+				break;	
+	}
+
+	newPosX=parseInt(newPosX);
+	newPosY=parseInt(newPosY);
+
+	if(validPoint(newPosX,newPosY))
+		return true;
+	else
+		return false;
+}
+
+function findSafe()
+{
+	var i,dirs;
+	dirs=['L','R','U','D'];
+	
+	for(i=0;i<4;i++)
+		if(isSafe(dirs[i]))
+			return dirs[i];
+	return dir;
+}
+
+
 function getMove()
 {
 	if(isLeft())
@@ -494,4 +536,7 @@ function getMove()
 		goUp();
 	else if(isDown())
 		goDown();
+
+	if(!isSafe(dir))
+		dir=findSafe();
 }
