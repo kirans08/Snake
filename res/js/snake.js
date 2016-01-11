@@ -349,6 +349,7 @@ function move()
 	var newPosX,newPosY;
 	newPosX=currentX;
 	newPosY=currentY;
+	getMove();
 	switch(dir)
 	{
 		case 'L':newPosX--;
@@ -423,3 +424,43 @@ $(document).keydown(function(event){
 	}
 
 });
+
+function goLeft()
+{
+	if(currentX>foodX)
+		return true;
+	return false;
+}
+
+function goRight()
+{
+	if(currentX<foodX)
+		return true;
+	return false;
+}
+
+function goUp()
+{
+	if(currentY>foodY)
+		return true;
+	return false;
+}
+
+function goDown()
+{
+	if(currentY<foodY)
+		return true;
+	return false;
+}
+
+function getMove()
+{
+	if(goLeft())
+		dir='L';
+	else if(goRight())
+		dir='R';
+	else if(goUp())
+		dir='U';
+	else if(goDown())
+		dir='D';
+}
