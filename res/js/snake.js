@@ -25,7 +25,7 @@ $(document).ready(function(){
 	var bgimg=document.getElementById("bgimage");
 	ctx.drawImage(bgimg,0,0);
 	initBoard();	 // BLOCK SIZE, REFRESH RATE
-	initSnake();  // REFRESH INTERVAL, SCORE, LEVEL, LEVEL TARGETS, BASE SCORE
+	initSnake(100,0,1,1000);  // REFRESH INTERVAL, SCORE, LEVEL, LEVEL TARGETS, BASE SCORE
 	initRes();
 	updateSnake();
 });
@@ -425,42 +425,73 @@ $(document).keydown(function(event){
 
 });
 
-function goLeft()
+function isLeft()
 {
 	if(currentX>foodX)
 		return true;
 	return false;
 }
 
-function goRight()
+function isRight()
 {
 	if(currentX<foodX)
 		return true;
 	return false;
 }
 
-function goUp()
+function isUp()
 {
 	if(currentY>foodY)
 		return true;
 	return false;
 }
 
-function goDown()
+function isDown()
 {
 	if(currentY<foodY)
 		return true;
 	return false;
 }
 
+function goLeft()
+{
+	if(dir!='R')
+		dir='L';
+	else
+		dir='U';
+}
+
+function goRight()
+{
+	if(dir!='L')
+		dir='R';
+	else
+		dir='D';
+}
+
+function goUp()
+{
+	if(dir!='D')
+		dir='U';
+	else
+		dir='R';
+}
+
+function goDown()
+{
+	if(dir!='U')
+		dir='D'
+	else
+		dir='L';
+}
 function getMove()
 {
-	if(goLeft())
-		dir='L';
-	else if(goRight())
-		dir='R';
-	else if(goUp())
-		dir='U';
-	else if(goDown())
-		dir='D';
+	if(isLeft())
+		goLeft();
+	else if(isRight())
+		goRight();
+	else if(isUp())
+		goUp();
+	else if(isDown())
+		goDown();
 }
