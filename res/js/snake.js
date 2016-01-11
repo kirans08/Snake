@@ -1,4 +1,4 @@
-var refreshInterval,refreshRate,score,level,levelUpdateScore,levelTargets,baseScore;
+var refreshInterval,refreshRate,score,highScore,level,levelUpdateScore,levelTargets,baseScore;
 var canvas,ctx;
 
 var cellSize,canvasWidth,canvasHeight,xMax,yMax,queueSize;
@@ -56,7 +56,7 @@ function initSnake(updateInterval,currentScore,currentLevel,levelFoods,foodScore
 	/*********DEFAULT VALUES***********/
 
 	if(updateInterval===undefined)
-		updateInterval=100;
+		updateInterval=10;
 	if(currentScore===undefined)
 		currentScore=0;
 	if(currentLevel===undefined)
@@ -121,6 +121,8 @@ function initRes()
 	lu=document.getElementById("lu");
 	rd=document.getElementById("rd");
 	ru=document.getElementById("ru");
+
+	highScore=0;
 
 }
 
@@ -313,16 +315,28 @@ function updateLevel()
 
 }
 
+function updateHighScore()
+{
+	highScore=score;
+	$("#high").fadeOut();
+	$("#high").fadeIn();
+	setTimeout(function(){
+		$("#high").html(""+score);
+	},updateInterval);
+}
+
 function updateScore()
 {
 	score+=(baseScore*level);
+	if(score>highScore)
+		updateHighScore();
 	if(score==levelUpdateScore)
 		updateLevel();
 	$("#score").fadeOut();
 	$("#score").fadeIn();
 	setTimeout(function(){
 		$("#score").html(""+score);
-	},100);
+	},updateInterval);
 }
 
 function addCurrent()
