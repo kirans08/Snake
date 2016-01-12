@@ -16,6 +16,7 @@ var headl,headr,headu,headd,taill,tailr,tailu,taild,food,ld,lu,rd,ru,body;
 var autoPlay;
 var start;
 
+var lDist,rDist,uDist,dDist;
 
 
 $(document).ready(function(){
@@ -59,7 +60,7 @@ function initSnake(updateInterval,currentScore,currentLevel,levelFoods,foodScore
 	/*********DEFAULT VALUES***********/
 
 	if(updateInterval===undefined)
-		updateInterval=10;
+		updateInterval=1;
 	if(currentScore===undefined)
 		currentScore=0;
 	if(currentLevel===undefined)
@@ -490,28 +491,28 @@ $(document).keydown(function(event){
 
 function isLeft()
 {
-	if(currentX>foodX)
+	if(lDist<rDist)
 		return true;
 	return false;
 }
 
 function isRight()
 {
-	if(currentX<foodX)
+	if(rDist<lDist)
 		return true;
 	return false;
 }
 
 function isUp() 
 {
-	if(currentY>foodY)
+	if(uDist<dDist)
 		return true;
 	return false;
 }
 
 function isDown()
 {
-	if(currentY<foodY)
+	if(dDist<uDist)
 		return true;
 	return false;
 }
@@ -588,11 +589,10 @@ function findSafe()
 }
 
 
-function findPath()
+function calcDist()
 {
 	var targX,targY,startX,startY;
 	var snakeX,snakeY;
-	var lDist,rDist,uDist,dDist;
 	var i,j;
 
 	
@@ -605,12 +605,12 @@ function findPath()
 	startX=currentX;
 	startY=currentY;
 
-	for(i=rear;i!=front;i=(i+1)%queueSize)
+	/*for(i=rear;i!=front;i=(i+1)%queueSize)
 	{
 		snakeX[j]=xCords[i];
 		snakeY[j]=yCords[i];
 		j++;
-	}
+	}*/
 
 	lDist=startX-targX;
 	if(lDist<0)
@@ -638,20 +638,110 @@ function findPath()
 
 
 
+function findIndex(newPosX,newPosY)
+{
+	var i;
+	for(i=rear;i!=front;i=(i+1)%queueSize)
+	{
+		if((xCords[i]==newPosX)&&(yCords[i]==newPosY))
+			return i;
+	}
+	return -1;
+}
+
+
 
 
 
 function getMove()
 {
-	if(isLeft()&&isSafe('L'))
-		goLeft();
-	else if(isRight()&&isSafe('R'))
-		goRight();
-	else if(isUp()&&isSafe('U'))
-		goUp();
-	else if(isDown()&&isSafe('D'))
-		goDown();
+	var i,tempDir;
+	// if(isLeft()&&isSafe('L'))
+	// 	goLeft();
+	// else if(isRight()&&isSafe('R'))
+	// 	goRight();
+	// else if(isUp()&&isSafe('U'))
+	// 	goUp();
+	// else if(isDown()&&isSafe('D'))
+	// 	goDown();
 
+	// if(!isSafe(dir))
+	// 	dir=findSafe();
+
+	calcDist();
+
+	if(isLeft())
+	{
+		if(isSafe('L'))
+			goLeft();
+		else
+		{
+			i=findIndex(currentX-1,currentY);
+			if(i!=-1)
+			{
+				tempDir=directions[i];
+				if(tempDir=='U')
+					dir='D';
+				else
+					dir='U';
+			}
+
+		}
+	}	
+	else if(isRight())
+	{
+		if(isSafe('R'))
+			goRight();
+		else
+		{
+			i=findIndex(currentX+1,currentY);
+			if(i!=-1)
+			{
+				tempDir=directions[i];
+				if(tempDir=='U')
+					dir='D';
+				else
+					dir='U';
+			}
+
+		}
+	}
+	else if(isUp())
+	{
+		if(isSafe('U'))
+			goUp();
+		else
+		{
+			i=findIndex(currentX,currentY-1);
+			if(i!=-1)
+			{
+				tempDir=directions[i];
+				if(tempDir=='R')
+					dir='L';
+				else
+					dir='R';
+			}
+
+		}
+	}
+	else if(isDown())
+	{
+		if(isSafe('D'))
+			goDown();
+		else
+		{
+			i=findIndex(currentX,currentY+1);
+			if(i!=-1)
+			{
+				tempDir=directions[i];
+				if(tempDir=='R')
+					dir='L';
+				else
+					dir='R';
+			}
+
+		}
+	}
 	if(!isSafe(dir))
 		dir=findSafe();
 }
