@@ -30,30 +30,57 @@
 
 
 	<div class="container">
-		<div class="text-center"> 
-			<canvas id="background" width="800" height="500"></canvas>
+		<div class="row">
+			<div class="col-sm-9">
+				<canvas id="background" width="800" height="500"></canvas>
+			</div> 
+			<div class="col-sm-3">
+				<div class="stats">
+					<div class="row">
+						 <div class="col-xs-8">
+							<div>
+								Score&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp :
+							</div>
+						 </div>
+						 <div class="col-xs-4">
+							<div id="score">
+								0
+							</div>
+						 </div>
+					</div>
+					<div class="row">
+						 <div class="col-xs-8 ">
+							<div >
+								Level&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp :
+							</div>
+						 </div>
+						 <div class="col-xs-4">
+							<div  id="level">
+								1
+							</div>
+						 </div>
+					</div>
+					<div class="row">
+						 <div class="col-xs-8 ">
+							<div >
+								HighScore :
+							</div>
+						 </div>
+						 <div class="col-xs-4">
+							<div  id="high">
+								0
+							</div>
+						 </div>
+					</div>
+				</div>
+				<br><br>
+				<div class="row">
+					<div class="text-center">
+						<button class="button btn-lg btn-success" onclick="switchAuto()" id="switchAuto" type="button">AUTOPLAY</button>
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="row" id="stats">
-			<div class="col-xs-2 ">
-				<h1 >&nbsp&nbsp&nbsp&nbspScore : </h1>
-			</div>
-			<div class="col-xs-1" >
-				<h1  id="score">0</h1>
-			</div>
-			<div class="col-xs-2 col-xs-offset-1 ">
-				<h1 >&nbsp&nbsp&nbsp&nbspLevel : </h1>
-			</div>
-			<div class="col-xs-1" >
-				<h1  id="level">1</h1>
-			</div>
-			<div class="col-xs-3 col-xs-offset-1 ">
-				<h1 >&nbsp&nbsp&nbsp&nbspHighScore : </h1>
-			</div>
-			<div class="col-xs-1" >
-				<h1  id="high">0</h1>
-			</div>
-		</div>
-
 	</div>
 
 

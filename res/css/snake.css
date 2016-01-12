@@ -2,8 +2,9 @@ body{
 	background-color: #3b5998;
 }
 
-#stats{
+.stats{
 	color:#FFF;
+	font-size: 31px;
 }
 
 #background{

@@ -13,6 +13,8 @@ var dir,prevDir;
 
 var headl,headr,headu,headd,taill,tailr,tailu,taild,food,ld,lu,rd,ru,body;
 
+var autoPlay;
+
 
 
 $(document).ready(function(){
@@ -51,20 +53,22 @@ function initBoard(blockSize,updateRate)
 
 
 
-function initSnake(updateInterval,currentScore,currentLevel,levelFoods,foodScore)
+function initSnake(updateInterval,currentScore,currentLevel,levelFoods,foodScore,auto)
 {
 	/*********DEFAULT VALUES***********/
 
 	if(updateInterval===undefined)
-		updateInterval=10;
+		updateInterval=100;
 	if(currentScore===undefined)
 		currentScore=0;
 	if(currentLevel===undefined)
 		currentLevel=1;
 	if(levelFoods===undefined)
-		levelFoods=100;
+		levelFoods=1000;
 	if(foodScore===undefined)
 		foodScore=10;
+	if(auto==undefined)
+		auto=false;
 
 
 	/**********INITIAL VALUES***********/
@@ -76,12 +80,16 @@ function initSnake(updateInterval,currentScore,currentLevel,levelFoods,foodScore
 	levelUpdateScore=currentScore+(levelFoods*foodScore*currentLevel);
 	levelTargets=levelFoods;
 	baseScore=foodScore;
+	autoPlay=auto;
 
 	$("#score").html(""+score);
 	$("#level").html(""+level);
 
+	setAutoSwitch();
+
 	/**********************************/
-	
+
+
 
 	currentX=1;
 	currentY=parseInt(yMax/2);
@@ -124,6 +132,29 @@ function initRes()
 
 	highScore=0;
 
+}
+
+function switchAuto()
+{
+	autoPlay=!autoPlay;
+	setAutoSwitch();
+}
+
+function setAutoSwitch()
+{
+	if(autoPlay==true)
+	{
+		$("#switchAuto").removeClass("btn-success");
+		$("#switchAuto").addClass("btn-warning");
+		$("#switchAuto").html("MANUAL");	
+	}
+	else
+	{
+		$("#switchAuto").removeClass("btn-warning");
+		$("#switchAuto").addClass("btn-success");
+		$("#switchAuto").html("AUTOPLAY");	
+
+	}
 }
 
 function updateSnake()
@@ -311,18 +342,18 @@ function updateLevel()
 		$("#level").html(""+level);
 	},100);
 
-	initSnake(refreshInterval/refreshRate,score,level,levelTargets,baseScore);
+	initSnake(refreshInterval/refreshRate,score,level,levelTargets,baseScore,autoPlay);
 
 }
 
 function updateHighScore()
 {
 	highScore=score;
-	$("#high").fadeOut();
-	$("#high").fadeIn();
+	/*$("#high").fadeOut();
+	$("#high").fadeIn();*/
 	setTimeout(function(){
 		$("#high").html(""+score);
-	},updateInterval);
+	},refreshInterval);
 }
 
 function updateScore()
@@ -332,11 +363,11 @@ function updateScore()
 		updateHighScore();
 	if(score==levelUpdateScore)
 		updateLevel();
-	$("#score").fadeOut();
-	$("#score").fadeIn();
+	/*$("#score").fadeOut();
+	$("#score").fadeIn();*/
 	setTimeout(function(){
 		$("#score").html(""+score);
-	},updateInterval);
+	},refreshInterval);
 }
 
 function addCurrent()
@@ -357,13 +388,14 @@ function removeLast()
 	rear=(rear+1)%queueSize;
 }
 
-function move()
+function getNextMove(moveDir)
 {
 	var newPosX,newPosY;
+	var nextPos;
+	nextPos = {x:0,y:0};
 	newPosX=currentX;
 	newPosY=currentY;
-	getMove();
-	switch(dir)
+	switch(moveDir)
 	{
 		case 'L':newPosX--;
 				if(newPosX<0)
@@ -379,8 +411,20 @@ function move()
 				break;	
 	}
 
-	newPosX=parseInt(newPosX);
-	newPosY=parseInt(newPosY);
+	nextPos.x=parseInt(newPosX);
+	nextPos.y=parseInt(newPosY);
+	return nextPos;
+}
+
+function move()
+{
+	var newPos,newPosX,newPosY;
+	if(autoPlay)
+		getMove();
+
+	newPos=getNextMove(dir);
+	newPosX=newPos.x;
+	newPosY=newPos.y;
 
 	if(validPoint(newPosX,newPosY))
 	{
@@ -500,27 +544,12 @@ function goDown()
 
 function isSafe(nextMoveDir)
 {
-	var newPosX,newPosY;
-	newPosX=currentX;
-	newPosY=currentY;
-	switch(nextMoveDir)
-	{
-		case 'L':newPosX--;
-				if(newPosX<0)
-					newPosX=xMax-1;
-				break;
-		case 'R':newPosX=(newPosX+1)%xMax;
-				break;
-		case 'U':newPosY--;
-				if(newPosY<0)
-					newPosY=yMax-1;
-				break;
-		case 'D':newPosY=(newPosY+1)%yMax;
-				break;	
-	}
+	var newPos,newPosX,newPosY;
 
-	newPosX=parseInt(newPosX);
-	newPosY=parseInt(newPosY);
+	newPos=getNextMove(nextMoveDir);
+
+	newPosX=newPos.x;
+	newPosY=newPos.y;
 
 	if(validPoint(newPosX,newPosY))
 		return true;
@@ -554,3 +583,5 @@ function getMove()
 	if(!isSafe(dir))
 		dir=findSafe();
 }
+
+
