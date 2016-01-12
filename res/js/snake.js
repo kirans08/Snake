@@ -502,7 +502,7 @@ function isRight()
 	return false;
 }
 
-function isUp()
+function isUp() 
 {
 	if(currentY>foodY)
 		return true;
@@ -574,6 +574,8 @@ function isSafe(nextMoveDir)
 	return false;
 }
 
+
+
 function findSafe()
 {
 	var i,dirs;
@@ -585,42 +587,69 @@ function findSafe()
 	return dir;
 }
 
-/*function isLoop(nextMoveDir)
+
+function findPath()
 {
-	var newPos,newPosX,newPosY;
+	var targX,targY,startX,startY;
+	var snakeX,snakeY;
+	var lDist,rDist,uDist,dDist;
+	var i,j;
 
-	newPos=getNextMove(nextMoveDir);
+	
+	j=0;
+	snakeX=new Array();
+	snakeY=new Array();
+	
+	targX=foodX;
+	targY=foodY;
+	startX=currentX;
+	startY=currentY;
 
-	newPosX=newPos.x;
-	newPosY=newPos.y;
-
-	if(!isValidPoint(newPosX,newPosY))
-		return true;
-
-	switch(dir)
+	for(i=rear;i!=front;i=(i+1)%queueSize)
 	{
-		case 'L':
-		case 'R':if(isValidPoint(newPosX,newPosY-1)||isValidPoint(newPosX,newPosY+1))
-					return false;
-				break;
-		case 'U':
-		case 'D':if(isValidPoint(newPosX-1,newPosY)||isValidPoint(newPosX+1,newPosY))
-					return false;
-
+		snakeX[j]=xCords[i];
+		snakeY[j]=yCords[i];
+		j++;
 	}
-	return true;
-}*/
+
+	lDist=startX-targX;
+	if(lDist<0)
+		lDist+=canvasWidth;
+
+	rDist=targX-startX;
+	if(rDist<0)
+		rDist+=canvasWidth;
+
+	uDist=startY-targY;
+	if(uDist<0)
+		uDist+=canvasHeight;
+
+	dDist=targY-startY;
+	if(dDist<0)
+		dDist+=canvasHeight;
+
+
+
+
+
+
+
+}
+
+
+
+
 
 
 function getMove()
 {
-	if(isLeft())
+	if(isLeft()&&isSafe('L'))
 		goLeft();
-	else if(isRight())
+	else if(isRight()&&isSafe('R'))
 		goRight();
-	else if(isUp())
+	else if(isUp()&&isSafe('U'))
 		goUp();
-	else if(isDown())
+	else if(isDown()&&isSafe('D'))
 		goDown();
 
 	if(!isSafe(dir))
