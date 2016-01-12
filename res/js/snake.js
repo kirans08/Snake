@@ -14,6 +14,7 @@ var dir,prevDir;
 var headl,headr,headu,headd,taill,tailr,tailu,taild,food,ld,lu,rd,ru,body;
 
 var autoPlay;
+var start;
 
 
 
@@ -58,7 +59,7 @@ function initSnake(updateInterval,currentScore,currentLevel,levelFoods,foodScore
 	/*********DEFAULT VALUES***********/
 
 	if(updateInterval===undefined)
-		updateInterval=100;
+		updateInterval=10;
 	if(currentScore===undefined)
 		currentScore=0;
 	if(currentLevel===undefined)
@@ -68,7 +69,7 @@ function initSnake(updateInterval,currentScore,currentLevel,levelFoods,foodScore
 	if(foodScore===undefined)
 		foodScore=10;
 	if(auto==undefined)
-		auto=false;
+		auto=true;
 
 
 	/**********INITIAL VALUES***********/
@@ -157,15 +158,20 @@ function setAutoSwitch()
 	}
 }
 
-function updateSnake()
+function updateSnake(timestamp)
 {
+	var progress;
+	if(!start)
+		start=timestamp;
+	progress=timestamp-start;
 
 	if(move())
 		draw();
-
-	setTimeout(updateSnake,refreshInterval);
+	//window.requestAnimationFrame(updateSnake);
+	setTimeout(function() {
+        window.requestAnimationFrame(updateSnake);
+    }, refreshInterval);
 }
-
 function drawBackground()
 {
 
@@ -301,7 +307,7 @@ function draw()
 	drawFood();
 }
 
-function validPoint(xPos,yPos)
+function isValidPoint(xPos,yPos)
 {
 	var i;
 	for(i=rear;i!=front;i=(i+1)%queueSize)
@@ -322,7 +328,7 @@ function addFood()
 		foodX=parseInt(rand+1);
 		rand=Math.random()*(yMax-1);
 		foodY=parseInt(rand+1);
-		success=validPoint(foodX,foodY);
+		success=isValidPoint(foodX,foodY);
 	}
 }
 
@@ -426,7 +432,7 @@ function move()
 	newPosX=newPos.x;
 	newPosY=newPos.y;
 
-	if(validPoint(newPosX,newPosY))
+	if(isValidPoint(newPosX,newPosY))
 	{
 		currentX=newPosX;
 		currentY=newPosY;
@@ -551,10 +557,21 @@ function isSafe(nextMoveDir)
 	newPosX=newPos.x;
 	newPosY=newPos.y;
 
-	if(validPoint(newPosX,newPosY))
-		return true;
-	else
+	if(!isValidPoint(newPosX,newPosY))
 		return false;
+
+	switch(dir)
+	{
+		case 'L':
+		case 'R':if(isValidPoint(newPosX,newPosY-1)||isValidPoint(newPosX,newPosY+1))
+					return true;
+				break;
+		case 'U':
+		case 'D':if(isValidPoint(newPosX-1,newPosY)||isValidPoint(newPosX+1,newPosY))
+					return true;
+
+	}
+	return false;
 }
 
 function findSafe()
@@ -567,6 +584,32 @@ function findSafe()
 			return dirs[i];
 	return dir;
 }
+
+/*function isLoop(nextMoveDir)
+{
+	var newPos,newPosX,newPosY;
+
+	newPos=getNextMove(nextMoveDir);
+
+	newPosX=newPos.x;
+	newPosY=newPos.y;
+
+	if(!isValidPoint(newPosX,newPosY))
+		return true;
+
+	switch(dir)
+	{
+		case 'L':
+		case 'R':if(isValidPoint(newPosX,newPosY-1)||isValidPoint(newPosX,newPosY+1))
+					return false;
+				break;
+		case 'U':
+		case 'D':if(isValidPoint(newPosX-1,newPosY)||isValidPoint(newPosX+1,newPosY))
+					return false;
+
+	}
+	return true;
+}*/
 
 
 function getMove()
