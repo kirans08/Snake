@@ -16,7 +16,8 @@ var headl,headr,headu,headd,taill,tailr,tailu,taild,food,ld,lu,rd,ru,body;
 var autoPlay;
 var start;
 
-var lDist,rDist,uDist,dDist;
+var lDist,rDist,uDist,dDist,hDist,vDist;
+
 
 
 $(document).ready(function(){
@@ -30,6 +31,7 @@ $(document).ready(function(){
 	initBoard();	 // BLOCK SIZE, REFRESH RATE
 	initSnake();  // REFRESH INTERVAL, SCORE, LEVEL, LEVEL TARGETS, BASE SCORE
 	initRes();
+	start=true;
 	updateSnake();
 });
 
@@ -87,7 +89,7 @@ function initSnake(updateInterval,currentScore,currentLevel,levelFoods,foodScore
 	$("#score").html(""+score);
 	$("#level").html(""+level);
 
-	setAutoSwitch();
+	setAutoToggle();
 
 	/**********************************/
 
@@ -105,14 +107,8 @@ function initSnake(updateInterval,currentScore,currentLevel,levelFoods,foodScore
 	currentX++;
 	addCurrent();
 	addFood();
-	logData()
 
 
-}
-
-function logData()
-{
-	console.log("X : "+currentX+";Y : "+currentY+";Direction : "+dir+";Front : "+front+";Rear : "+rear+";FoodX : "+foodX+";FoodY : "+foodY);
 }
 
 function initRes()
@@ -136,35 +132,44 @@ function initRes()
 
 }
 
-function switchAuto()
+function togglePlay()
 {
-	autoPlay=!autoPlay;
-	setAutoSwitch();
-}
-
-function setAutoSwitch()
-{
-	if(autoPlay==true)
+	start=!start;
+	if(start)
 	{
-		$("#switchAuto").removeClass("btn-success");
-		$("#switchAuto").addClass("btn-warning");
-		$("#switchAuto").html("MANUAL");	
+		$("#togglePlay").html("PAUSE");
 	}
 	else
 	{
-		$("#switchAuto").removeClass("btn-warning");
-		$("#switchAuto").addClass("btn-success");
-		$("#switchAuto").html("AUTOPLAY");	
+		$("#togglePlay").html("PLAY");
+	}
+}
+
+function toggleAuto()
+{
+	autoPlay=!autoPlay;
+	setAutoToggle();
+}
+
+function setAutoToggle()
+{
+	if(autoPlay==true)
+	{
+		$("#toggleAuto").removeClass("btn-success");
+		$("#toggleAuto").addClass("btn-warning");
+		$("#toggleAuto").html("MANUAL");	
+	}
+	else
+	{
+		$("#toggleAuto").removeClass("btn-warning");
+		$("#toggleAuto").addClass("btn-success");
+		$("#toggleAuto").html("AUTOPLAY");	
 
 	}
 }
 
 function updateSnake(timestamp)
 {
-	var progress;
-	if(!start)
-		start=timestamp;
-	progress=timestamp-start;
 
 	if(move())
 		draw();
@@ -426,19 +431,23 @@ function getNextMove(moveDir)
 function move()
 {
 	var newPos,newPosX,newPosY;
+
+	if(!start)
+		return false;
+
 	if(autoPlay)
 		getMove();
 
 	newPos=getNextMove(dir);
 	newPosX=newPos.x;
 	newPosY=newPos.y;
-
 	if(isValidPoint(newPosX,newPosY))
 	{
 		currentX=newPosX;
 		currentY=newPosY;
 		prevDir=dir;
 		addCurrent();
+		basicLog();
 		if(isFood())
 		{
 			addFood();
@@ -449,7 +458,9 @@ function move()
 	}
 	else
 	{
+		detailedLog();
 		initSnake();
+		return false;
 	}
 	return true;
 
@@ -486,18 +497,24 @@ $(document).keydown(function(event){
 			dir='R';
 		}
 	}
+	else if(event.which==32)
+	{
+		togglePlay();
+	}
 
 });
 
 function isLeft()
 {
-	if(lDist<rDist)
+
+	if((lDist<=rDist)&&(lDist!=0))
 		return true;
 	return false;
 }
 
 function isRight()
 {
+
 	if(rDist<lDist)
 		return true;
 	return false;
@@ -505,13 +522,15 @@ function isRight()
 
 function isUp() 
 {
-	if(uDist<dDist)
+
+	if((uDist<=dDist)&&(uDist!=0))
 		return true;
 	return false;
 }
 
 function isDown()
 {
+
 	if(dDist<uDist)
 		return true;
 	return false;
@@ -549,7 +568,7 @@ function goDown()
 		dir='L';
 }
 
-function isSafe(nextMoveDir)
+function isBlock(nextMoveDir)
 {
 	var newPos,newPosX,newPosY;
 
@@ -558,23 +577,41 @@ function isSafe(nextMoveDir)
 	newPosX=newPos.x;
 	newPosY=newPos.y;
 
-	if(!isValidPoint(newPosX,newPosY))
+	if(isValidPoint(newPosX,newPosY))
 		return false;
 
-	switch(dir)
+	return true;
+}
+
+function isLoop1(nextMoveDir)
+{
+	var newPos,newPosX,newPosY;
+
+	newPos=getNextMove(nextMoveDir);
+
+	newPosX=newPos.x;
+	newPosY=newPos.y;
+
+	switch(nextMoveDir)
 	{
 		case 'L':
 		case 'R':if(isValidPoint(newPosX,newPosY-1)||isValidPoint(newPosX,newPosY+1))
-					return true;
+					return false;
 				break;
 		case 'U':
 		case 'D':if(isValidPoint(newPosX-1,newPosY)||isValidPoint(newPosX+1,newPosY))
-					return true;
+					return false;
 
 	}
-	return false;
+	return true;	
 }
 
+function isSafe(nextMoveDir)
+{
+	if(isBlock(nextMoveDir)||isLoop1(nextMoveDir))
+		return false;
+	return true;
+}
 
 
 function findSafe()
@@ -584,6 +621,10 @@ function findSafe()
 	
 	for(i=0;i<4;i++)
 		if(isSafe(dirs[i]))
+			return dirs[i];
+
+	for(i=0;i<4;i++)
+		if(!isBlock(dirs[i]))
 			return dirs[i];
 	return dir;
 }
@@ -599,7 +640,7 @@ function calcDist()
 	j=0;
 	snakeX=new Array();
 	snakeY=new Array();
-	
+
 	targX=foodX;
 	targY=foodY;
 	startX=currentX;
@@ -612,27 +653,24 @@ function calcDist()
 		j++;
 	}*/
 
+
+
 	lDist=startX-targX;
 	if(lDist<0)
-		lDist+=canvasWidth;
-
+		lDist+=xMax;
 	rDist=targX-startX;
 	if(rDist<0)
-		rDist+=canvasWidth;
+		rDist+=xMax;
 
 	uDist=startY-targY;
 	if(uDist<0)
-		uDist+=canvasHeight;
+		uDist+=yMax;
 
 	dDist=targY-startY;
 	if(dDist<0)
-		dDist+=canvasHeight;
-
-
-
-
-
-
+		dDist+=yMax;
+	hDist=Math.min(lDist,rDist);
+	vDist=Math.min(uDist,dDist);
 
 }
 
@@ -649,6 +687,10 @@ function findIndex(newPosX,newPosY)
 	return -1;
 }
 
+function isLoop2(nextMoveDir)
+{
+	 var i,tempDir;
+}
 
 
 
@@ -656,17 +698,8 @@ function findIndex(newPosX,newPosY)
 function getMove()
 {
 	var i,tempDir;
-	// if(isLeft()&&isSafe('L'))
-	// 	goLeft();
-	// else if(isRight()&&isSafe('R'))
-	// 	goRight();
-	// else if(isUp()&&isSafe('U'))
-	// 	goUp();
-	// else if(isDown()&&isSafe('D'))
-	// 	goDown();
+	var newPos,newPosX,newPosY;
 
-	// if(!isSafe(dir))
-	// 	dir=findSafe();
 
 	calcDist();
 
@@ -682,8 +715,17 @@ function getMove()
 				tempDir=directions[i];
 				if(tempDir=='U')
 					dir='D';
-				else
+				else if(tempDir=='D')
 					dir='U';
+				else
+				{
+					// tempDir=directions[(i+1)%queueSize]
+					// if(tempDir=='U')
+					// 	dir='D';
+					// else if(tempDir=='D')
+					// 	dir='U';
+
+				}
 			}
 
 		}
@@ -700,8 +742,16 @@ function getMove()
 				tempDir=directions[i];
 				if(tempDir=='U')
 					dir='D';
-				else
+				else if(tempDir=='D')
 					dir='U';
+				else
+				{
+					// tempDir=directions[(i+1)%queueSize]
+					// if(tempDir=='U')
+					// 	dir='D';
+					// else if(tempDir=='D')
+					// 	dir='U';
+				}
 			}
 
 		}
@@ -718,8 +768,16 @@ function getMove()
 				tempDir=directions[i];
 				if(tempDir=='R')
 					dir='L';
-				else
+				else if(tempDir=='L')
 					dir='R';
+				else
+				{
+					// tempDir=directions[(i+1)%queueSize]
+					// if(tempDir=='R')
+					// 	dir='L';
+					// else if(tempDir=='L')
+					// 	dir='R';
+				}
 			}
 
 		}
@@ -736,14 +794,106 @@ function getMove()
 				tempDir=directions[i];
 				if(tempDir=='R')
 					dir='L';
-				else
+				else if(tempDir=='L')
 					dir='R';
+				else
+				{
+					// tempDir=directions[(i+1)%queueSize]
+					// if(tempDir=='R')
+					// 	dir='L';
+					// else if(tempDir=='L')
+					// 	dir='R';
+				}
+
 			}
 
 		}
 	}
+
+
+
 	if(!isSafe(dir))
+	{
+
+
+		console.log("\n/////////// FAIL SAFE //////////// \n");
+	//	detailedLog();
+		console.log("\n/////////// FAIL SAFE //////////// \n");
 		dir=findSafe();
+	}
 }
+
+
+
+/*******************DEBUG******************************/
+
+var enableLog=false;
+
+
+
+function basicLog()
+{
+	if(enableLog)
+	{
+		console.log("X:"+currentX+"; Y:"+currentY+"; Direction:"+dir+"; L:"+lDist+"; R:"+rDist+"; U:"+uDist+"; D:"+dDist);
+	}
+}
+
+function detailedLog()
+{
+	var i;
+	if(enableLog)
+	{
+		console.log("\n////////// DETAILED LOG ////////////");
+		console.log("\nVARIABLES\n");
+		console.log("Current X :"+currentX);
+		console.log("Current Y :"+currentY);
+		console.log("Direction :"+dir);
+		console.log("score     :"+score);
+		console.log("Food X    :"+foodX);
+		console.log("Food Y    :"+foodY);
+		console.log("Current Y :"+currentY);
+		console.log("Current X :"+currentX);
+		console.log("Current Y :"+currentY);
+		console.log("\nFUNCIONS\n");
+		console.log("isSafe    :"+isSafe(dir));
+		console.log("isBlock   :"+isBlock(dir));
+		console.log("isLoop    :"+isLoop1(dir));
+		console.log("findSafe  :"+findSafe());
+		console.log("\nSNAKE BODY COORDINATES\n");
+		for(i=rear;i!=front;i=(i+1)%queueSize)
+		{
+			console.log("X:"+xCords[i]+"; Y:"+yCords[i]+"; Direction :"+directions[i]);
+		}
+
+		togglePlay();
+
+	}
+}
+
+
+
+function wait()
+{
+	while(!start);
+}
+
+function toggleLog()
+{
+	enableLog=!enableLog;
+	if(enableLog)
+	{
+		$("#toggleLog").html("STOP LOG");
+	}
+	else
+	{
+		$("#toggleLog").html("START LOG");
+	}
+}
+
+
+
+
+/******************************************************/
 
 
