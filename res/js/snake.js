@@ -468,13 +468,13 @@ function move()
 
 $(document).keydown(function(event){
 
-	event.preventDefault();
 	if((event.which==119)||(event.which==87)||(event.which==38))
 	{
 		if(prevDir!='D')
 		{
 			dir='U';
 		}
+		event.preventDefault();
 	}
     else if((event.which==97)||(event.which==65)||(event.which==37))
     {
@@ -482,6 +482,7 @@ $(document).keydown(function(event){
 		{
 			dir='L';
 		}
+		event.preventDefault();
 	}
 	else if((event.which==115)||(event.which==83)||(event.which==40))
 	{
@@ -489,6 +490,7 @@ $(document).keydown(function(event){
 		{
 			dir='D';
 		}
+		event.preventDefault();
 	}
 	else if((event.which==100)||(event.which==68)||(event.which==39))
 	{
@@ -496,10 +498,12 @@ $(document).keydown(function(event){
 		{
 			dir='R';
 		}
+		event.preventDefault();
 	}
 	else if(event.which==32)
 	{
 		togglePlay();
+		event.preventDefault();
 	}
 
 });
