@@ -1,6 +1,6 @@
 #SNAKE
 
-A Classic snake game built using HTML Canvas and javascript. AI mode is implemented using greedy algorithm. 
+A Classic snake game built using HTML Canvas and javascript. Auto Play mode is implemented using greedy algorithm. 
 
 #FUNCTIONS
 
