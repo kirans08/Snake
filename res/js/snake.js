@@ -18,6 +18,18 @@ var start;
 
 var lDist,rDist,uDist,dDist,hDist,vDist;
 
+var defaults = {
+
+	blockSize : 20,
+	updateRate : 2,
+	updateInterval : 1,
+	currentScore : 0,
+	currentLevel : 1,
+	levelFoods : 1000,
+	foodScore : 10,
+	auto : true
+};
+
 
 
 $(document).ready(function(){
@@ -39,9 +51,9 @@ function initBoard(blockSize,updateRate)
 {
 	/*********DEFAULT VALUES***********/
 	if(blockSize===undefined)
-		blockSize=20;
+		blockSize = defaults.blockSize;
 	if(updateRate===undefined)
-		updateRate=2;
+		updateRate = defaults.updateRate;
 
 	/**********INITIAL VALUES***********/
 	cellSize=blockSize;
@@ -62,17 +74,17 @@ function initSnake(updateInterval,currentScore,currentLevel,levelFoods,foodScore
 	/*********DEFAULT VALUES***********/
 
 	if(updateInterval===undefined)
-		updateInterval=1;
+		updateInterval = defaults.updateInterval;
 	if(currentScore===undefined)
-		currentScore=0;
+		currentScore = defaults.currentScore;
 	if(currentLevel===undefined)
-		currentLevel=1;
+		currentLevel = defaults.currentLevel;
 	if(levelFoods===undefined)
-		levelFoods=1000;
+		levelFoods = defaults.levelFoods;
 	if(foodScore===undefined)
-		foodScore=10;
+		foodScore = defaults.foodScore;
 	if(auto==undefined)
-		auto=true;
+		auto = defaults.auto;
 
 
 	/**********INITIAL VALUES***********/
@@ -354,15 +366,14 @@ function updateLevel()
 		$("#level").html(""+level);
 	},100);
 
-	initSnake(refreshInterval/refreshRate,score,level,levelTargets,baseScore,autoPlay);
+	initSnake(refreshInterval/refreshRate, score, level, levelTargets, baseScore + 10 ,autoPlay);
 
 }
 
 function updateHighScore()
 {
 	highScore=score;
-	/*$("#high").fadeOut();
-	$("#high").fadeIn();*/
+
 	setTimeout(function(){
 		$("#high").html(""+score);
 	},refreshInterval);
