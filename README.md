@@ -1,10 +1,13 @@
-#SNAKE
+# SNAKE
 
 A Classic snake game built using HTML Canvas and javascript. Auto Play mode is implemented using greedy algorithm. 
 
-#FUNCTIONS
+## Demo
+http://kirans08.github.io/snake/
 
-##initSnake(updateInterval, currentScore, currentLevel, levelFoods, foodScore, auto) 
+
+## Execution
+`initSnake(updateInterval, currentScore, currentLevel, levelFoods, foodScore, auto)`
 
 ### Parameters
 
@@ -52,7 +55,7 @@ These default values are used for testing the auto play.
  - updateRate: 2
 
 
-#INSTRUCTIONS
+### INSTRUCTIONS
 
  - Use W A S D for navigation in manual mode
  - Use Space bar for pause/resume
